@@ -8,7 +8,7 @@
       <router-link to="/protected">Protected Page 🛡️</router-link>
       <div id="divider"></div>
       <a
-        href="https://github.com/mmvergara/react-golang-postgresql-auth-template"
+        href="https://github.com/mmvergara/vue-golang-postgresql-auth-template"
         target="_blank"
         rel="noreferrer noopener"
         id="github-repo-link"
