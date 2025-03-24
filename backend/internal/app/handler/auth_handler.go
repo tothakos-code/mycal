@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
-
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -81,6 +81,7 @@ func (a *AuthHandler) HandleSignin() http.HandlerFunc {
 	}
 	type response struct {
 		User    *models.User `json:"user"`
+    Token   string       `json:"token"`
 		Expires int64        `json:"exp"`
 	}
 
@@ -118,7 +119,7 @@ func (a *AuthHandler) HandleSignin() http.HandlerFunc {
 			return
 		}
 
-		tokenString, exp, err := a.appJwt.CreateJwtWithClaims(user.UserID)
+		tokenString, exp, err := a.appJwt.CreateJwtWithClaims(user.ID)
 		if err != nil {
 			http.Error(w, "Server Error", http.StatusInternalServerError)
 			return
@@ -127,6 +128,7 @@ func (a *AuthHandler) HandleSignin() http.HandlerFunc {
 		user.PasswordHash = ""
 		signInResponse := response{
 			User:    user,
+			Token: tokenString,
 			Expires: exp.Unix(),
 		}
 
@@ -135,8 +137,31 @@ func (a *AuthHandler) HandleSignin() http.HandlerFunc {
 	}
 }
 
-func (a *AuthHandler) HandleCheckIfSignedIn(w http.ResponseWriter, r *http.Request) {
-	sendJson(w, struct{}{}, http.StatusOK)
+func (a *AuthHandler) HandleCheckIfSignedIn() http.HandlerFunc {
+  type response struct {
+    User      *models.User `json:"user"`
+    ExpiresAt  int64       `json:"exp"`
+  }
+  return func(w http.ResponseWriter, r *http.Request) {
+    claims := r.Context().Value(service.JwtClaimsContextKey).(*jwt.RegisteredClaims)
+    user, err := a.userRepo.GetUserByID(r.Context(), claims.Subject)
+    if err != nil {
+      log.Println(err)
+      http.Error(w, "Server Error", http.StatusInternalServerError)
+      return
+    }
+    if user == nil {
+      log.Println("User does not exist")
+      http.Error(w, "Invalid Credentials", http.StatusUnauthorized)
+      return
+    }
+    user.PasswordHash = ""
+    checkResponse := response{
+      User:    user,
+      ExpiresAt: claims.ExpiresAt.Unix(),
+    }
+	  sendJson(w, checkResponse, http.StatusOK)
+  }
 }
 
 func (a *AuthHandler) HandleSignout(w http.ResponseWriter, r *http.Request) {

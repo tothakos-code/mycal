@@ -36,7 +36,7 @@ func (u *UserRepo) GetUserByEmail(ctx context.Context, email string) (*models.Us
 	var user models.User
 	query := `SELECT * FROM users WHERE email = $1`
 	err := u.db.QueryRowContext(ctx, query, email).Scan(
-		&user.UserID,
+		&user.ID,
 		&user.Email,
 		&user.PasswordHash,
 		&user.CreatedAt,
@@ -55,7 +55,7 @@ func (u *UserRepo) GetUserByID(ctx context.Context, id string) (*models.User, er
 	var user models.User
 	query := `SELECT * FROM users WHERE user_id = $1`
 	err := u.db.QueryRowContext(ctx, query, id).Scan(
-		&user.UserID,
+		&user.ID,
 		&user.Email,
 		&user.PasswordHash,
 		&user.CreatedAt,

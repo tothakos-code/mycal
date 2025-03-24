@@ -3,7 +3,7 @@ version: "3.8"
 services:
   psql:
     image: postgres:latest
-    container_name: psql-gpa
+    container_name: mycal-db
     environment:
       POSTGRES_DB: ${DB_DATABASE}
       POSTGRES_USER: ${DB_USERNAME}
@@ -11,7 +11,7 @@ services:
     ports:
       - "${DB_PORT}:5432"
     volumes:
-      - psql_gpa_volume:/var/lib/postgresql/data
+      - mycal_volume:/var/lib/postgresql/data
 
 volumes:
-  psql_gpa_volume:
+  mycal_volume:

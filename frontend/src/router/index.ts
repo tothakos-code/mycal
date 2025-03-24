@@ -5,6 +5,7 @@ import SignUpPage from "../views/auth/SignUpPage.vue";
 import ProtectedPage from "../views/ProtectedPage.vue";
 import NotFoundPage from "../views/NotFoundPage.vue";
 import { useAuthStore } from "../stores/auth";
+import { watch } from "vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -37,11 +38,28 @@ const router = createRouter({
 
 router.beforeEach((to, _, next) => {
   const authStore = useAuthStore();
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next("/auth/sign-in");
-  } else {
-    next();
-  }
+  if (authStore.isLoading) {
+      const stopWatching = watch(
+        () => authStore.isLoading,
+        (isLoading) => {
+          if (!isLoading) {
+            stopWatching(); // Stop watching after it's done loading
+            proceedWithAuthCheck();
+          }
+        },
+        { immediate: true }
+      );
+    } else {
+      proceedWithAuthCheck();
+    }
+
+    function proceedWithAuthCheck() {
+      if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+        next("/auth/sign-in");
+      } else {
+        next();
+      }
+    }
 });
 
 export default router;

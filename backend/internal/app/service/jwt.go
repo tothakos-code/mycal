@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"golang-postgresql-auth-template/internal/app/repository"
-	"golang-postgresql-auth-template/internal/models"
 	"log"
 	"net/http"
 	"time"
@@ -40,7 +39,7 @@ func NewAppJwt(userRepo *repository.UserRepo, secret string, tokenDurationHrs ti
 	}
 }
 
-func (a *AppJwt) CreateJwtWithClaims(userID models.UserID) (string, time.Time, error) {
+func (a *AppJwt) CreateJwtWithClaims(userID uuid.UUID) (string, time.Time, error) {
 	expirationTime := time.Now().Add(a.tokenDurationHrs)
 
 	// https://datatracker.ietf.org/doc/html/rfc7519#section-4.1
@@ -146,7 +145,7 @@ func (a *AppJwt) DeleteJwt(w http.ResponseWriter) {
 }
 
 // GetUserIDFromContext retrieves the user ID from the request context
-func GetUserIDFromContext(r *http.Request) (models.UserID, bool) {
+func GetUserIDFromContext(r *http.Request) (uuid.UUID, bool) {
 	claims, ok := r.Context().Value(JwtClaimsContextKey).(*jwt.RegisteredClaims)
 	if !ok {
 		return uuid.Nil, false

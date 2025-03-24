@@ -1,7 +1,7 @@
 <template>
   <main>
     <section class="main-container">
-      <h1 class="header-text">Vue Golang Postgres Auth</h1>
+      <h1 class="header-text">MyCal event calendar</h1>
       <p>Current User : {{ state.user?.email || "None" }}</p>
       <button v-if="state.user" @click="signOut">Sign Out</button>
       <router-link v-else to="/auth/sign-in">Sign In</router-link>

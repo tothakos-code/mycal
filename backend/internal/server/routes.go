@@ -20,10 +20,10 @@ func RegisterRoutes(app *app.Application) http.Handler {
 	router.HandleFunc("POST /auth/signup", app.AuthHandler.HandleSignup())
 	router.HandleFunc("POST /auth/signin", app.AuthHandler.HandleSignin())
 	router.HandleFunc("POST /auth/signout", app.AuthHandler.HandleSignout)
+  router.HandleFunc("POST /auth/me", app.AppJwt.IsAuthenticatedMiddleware(app.AuthHandler.HandleCheckIfSignedIn()))
 
 	// V1 Protected Routes
 	v1Protected := http.NewServeMux()
-	v1Protected.HandleFunc("GET /auth-status", app.AuthHandler.HandleCheckIfSignedIn)
 
 	// Add middleware to protected routes
 	router.Handle("/v1/", http.StripPrefix("/v1", app.AppJwt.IsAuthenticatedMiddleware(v1Protected)))
