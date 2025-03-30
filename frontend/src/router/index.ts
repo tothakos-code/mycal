@@ -3,6 +3,7 @@ import HomePage from "../views/HomePage.vue";
 import SignInPage from "../views/auth/SignInPage.vue";
 import SignUpPage from "../views/auth/SignUpPage.vue";
 import ProtectedPage from "../views/ProtectedPage.vue";
+import EventsPage from "../views/EventsPage.vue";
 import NotFoundPage from "../views/NotFoundPage.vue";
 import { useAuthStore } from "../stores/auth";
 import { watch } from "vue";
@@ -19,6 +20,11 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/auth/sign-up",
     component: SignUpPage,
+  },
+  {
+    path: "/events",
+    component: EventsPage,
+    meta: { requiresAuth: true },
   },
   {
     path: "/protected",

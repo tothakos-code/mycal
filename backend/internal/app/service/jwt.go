@@ -94,7 +94,6 @@ func (a *AppJwt) IsAuthenticatedMiddleware(next http.Handler) http.HandlerFunc {
 			http.Error(w, "Session expired or invalid.", http.StatusUnauthorized)
 			return
 		}
-
 		exist, err := a.userRepo.CheckIfUserExistsByID(r.Context(), claims.Subject)
 		if err != nil {
 			log.Println("Server Error", err)

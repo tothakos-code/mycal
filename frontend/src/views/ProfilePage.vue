@@ -2,8 +2,11 @@
   <main>
     <router-link class="home-link" to="/">◄ Home</router-link>
     <section class="main-container">
-      <h1 class="header-text">This is a Protected Page</h1>
-      <p>Current User : {{ state.user?.email || "None" }}</p>
+      <h1 class="header-text">User profile</h1>
+      <p>Email : {{ state.user?.email || "None" }}</p>
+      <p>Username : {{ state.user?.username || "None" }}</p>
+      <p>Firstname : {{ state.user?.firstname || "None" }}</p>
+      <p>Surname : {{ state.user?.surname || "None" }}</p>
     </section>
   </main>
 </template>

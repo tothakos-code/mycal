@@ -24,6 +24,9 @@ func RegisterRoutes(app *app.Application) http.Handler {
 
 	// V1 Protected Routes
 	v1Protected := http.NewServeMux()
+  v1Protected.HandleFunc("GET /event/last-30", app.EventHandler.HandleListPublicEvents())
+  v1Protected.HandleFunc("PUT /event", app.EventHandler.HandleCreateEvent())
+  // v1Protected.HandleFunc("GET /invitation/pending")
 
 	// Add middleware to protected routes
 	router.Handle("/v1/", http.StripPrefix("/v1", app.AppJwt.IsAuthenticatedMiddleware(v1Protected)))

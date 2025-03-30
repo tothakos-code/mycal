@@ -5,6 +5,7 @@
       <p>Current User : {{ state.user?.email || "None" }}</p>
       <button v-if="state.user" @click="signOut">Sign Out</button>
       <router-link v-else to="/auth/sign-in">Sign In</router-link>
+      <router-link to="/events">Events 🛡️</router-link>
       <router-link to="/protected">Protected Page 🛡️</router-link>
       <div id="divider"></div>
       <a

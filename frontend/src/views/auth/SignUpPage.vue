@@ -18,6 +18,24 @@
         type="password"
         placeholder="Password"
       />
+      <input
+        v-model="formValues.username"
+        name="password"
+        type="text"
+        placeholder="Username"
+      />
+      <input
+        v-model="formValues.firstname"
+        name="password"
+        type="text"
+        placeholder="Firstaname"
+      />
+      <input
+        v-model="formValues.surname"
+        name="password"
+        type="text"
+        placeholder="Surname"
+      />
       <button type="submit">Create Account</button>
       <router-link class="auth-link" to="/auth/sign-in">
         Already have an account? Sign In
@@ -44,6 +62,9 @@ const error = ref("");
 const formValues = reactive({
   email: "",
   password: "",
+  username: "",
+  firstname: "",
+  surname: "",
 });
 
 const handleSubmit = async () => {

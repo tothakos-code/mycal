@@ -11,6 +11,7 @@ import (
 
 type Application struct {
 	AuthHandler *handler.AuthHandler
+	EventHandler *handler.EventHandler
 	// Add more handlers or services needed here
 	// Example
 	// Book Handler *handler.BookHandler
@@ -22,6 +23,7 @@ func NewApplication(cfg *config.Config) *Application {
 
 	// Repositories
 	userRepo := repository.NewUserRepo(db)
+	eventRepo := repository.NewEventRepo(db)
 	// bookRepo := repository.NewBookRepo(db)
 
 	// Services
@@ -33,6 +35,7 @@ func NewApplication(cfg *config.Config) *Application {
 
 	return &Application{
 		AuthHandler: handler.NewAuthHandler(userRepo, appJwt),
+    EventHandler: handler.NewEventHandler(eventRepo, userRepo),
 		// BookHandler: handler.NewBookHandler(bookRepo, cloudinary),
 		AppJwt: appJwt,
 	}

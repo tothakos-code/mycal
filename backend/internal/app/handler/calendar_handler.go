@@ -5,6 +5,7 @@ import (
 	"golang-postgresql-auth-template/internal/app/repository"
 	"log"
 	"net/http"
+  "github.com/google/uuid"
 )
 
 type CalendarHandler struct {
@@ -17,7 +18,7 @@ func NewCalendarHandler(calendarRepo *repository.CalendarRepo) *CalendarHandler 
 
 func (c *CalendarHandler) HandleCreateCalendar() http.HandlerFunc {
 	type request struct {
-		UserID   string `json:"user_id" validate:"required,uuid"`
+		UserID   uuid.UUID `json:"user_id" validate:"required,uuid"`
 		IsPublic bool   `json:"is_public"`
 	}
 

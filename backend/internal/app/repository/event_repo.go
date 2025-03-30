@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"golang-postgresql-auth-template/internal/models"
-  "github.com/lib/pq"
+  "github.com/google/uuid"
 )
 
 type EventRepo struct {
@@ -17,11 +17,15 @@ func NewEventRepo(db *sql.DB) *EventRepo {
 }
 
 func (e *EventRepo) CreateEvent(ctx context.Context, event models.Event) error {
-	query := `INSERT INTO event (id, calendar_id, description, location, start_date, end_date, start_time, end_time, notify_before)
-			  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+
+	query := `INSERT INTO event (user_id, title, description, location, start, finish, is_public, notify_before)
+			  VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+
 	_, err := e.db.ExecContext(ctx, query,
-		event.ID, event.CalendarID, event.Description, event.Location, event.StartDate, event.EndDate,
-		event.StartTime, event.EndTime, event.NotifyBefore)
+		event.UserID, event.Title, event.Description,
+    event.Location, event.Start, event.Finish,
+		event.Public, event.NotifyBefore)
+
 	return err
 }
 
@@ -29,9 +33,9 @@ func (e *EventRepo) GetEventByID(ctx context.Context, eventID string) (*models.E
 	var event models.Event
 	query := `SELECT * FROM event WHERE id = $1`
 	err := e.db.QueryRowContext(ctx, query, eventID).Scan(
-		&event.ID, &event.CalendarID, &event.Description, &event.Location,
-		&event.StartDate, &event.EndDate, &event.StartTime, &event.EndTime,
-		&event.NotifyBefore, &event.CreatedAt,
+		&event.ID, &event.UserID, &event.Title, &event.Description,
+    &event.Location, &event.Start, &event.Finish,
+		&event.Public, &event.NotifyBefore, &event.CreatedAt,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("database error: %w", err)
@@ -40,9 +44,8 @@ func (e *EventRepo) GetEventByID(ctx context.Context, eventID string) (*models.E
 }
 
 func (e *EventRepo) ListPublicEvents(ctx context.Context) ([]models.Event, error) {
-	query := `SELECT e.* FROM event e
-			  JOIN calendar c ON e.calendar_id = c.id
-			  WHERE c.is_public = TRUE`
+	query := `SELECT * FROM event
+			  WHERE is_public = TRUE`
 
 	rows, err := e.db.QueryContext(ctx, query)
 	if err != nil {
@@ -53,20 +56,25 @@ func (e *EventRepo) ListPublicEvents(ctx context.Context) ([]models.Event, error
 	var events []models.Event
 	for rows.Next() {
 		var event models.Event
-		if err := rows.Scan(&event.ID, &event.CalendarID, &event.Description,
-			&event.Location, &event.StartDate, &event.EndDate, &event.StartTime,
-			&event.EndTime, &event.NotifyBefore, &event.CreatedAt); err != nil {
+		if err := rows.Scan(&event.ID, &event.UserID,
+      &event.Title, &event.Description, &event.Location,
+      &event.Start, &event.Finish, &event.NotifyBefore,
+			&event.Public, &event.CreatedAt); err != nil {
 			return nil, err
 		}
 		events = append(events, event)
 	}
+
+  if events == nil {
+  	events = []models.Event{}
+  }
 	return events, nil
 }
 
-func (e *EventRepo) ListEventsByCalendars(ctx context.Context, calendarIDs []string) ([]models.Event, error) {
-	query := `SELECT * FROM event WHERE calendar_id = ANY($1)`
+func (e *EventRepo) ListEventsByUserID(ctx context.Context, userID uuid.UUID, is_public bool) ([]models.Event, error) {
+	query := `SELECT * FROM event WHERE user_id = $1 AND is_public = $2`
 
-	rows, err := e.db.QueryContext(ctx, query, pq.Array(calendarIDs))
+	rows, err := e.db.QueryContext(ctx, query, userID, is_public)
 	if err != nil {
 		return nil, err
 	}
@@ -75,9 +83,10 @@ func (e *EventRepo) ListEventsByCalendars(ctx context.Context, calendarIDs []str
 	var events []models.Event
 	for rows.Next() {
 		var event models.Event
-		if err := rows.Scan(&event.ID, &event.CalendarID, &event.Description,
-			&event.Location, &event.StartDate, &event.EndDate, &event.StartTime,
-			&event.EndTime, &event.NotifyBefore, &event.CreatedAt); err != nil {
+		if err := rows.Scan(&event.ID, &event.UserID,
+			&event.Title, &event.Description, &event.Location,
+      &event.Start, &event.Finish, &event.NotifyBefore,
+      &event.Public, &event.CreatedAt); err != nil {
 			return nil, err
 		}
 		events = append(events, event)

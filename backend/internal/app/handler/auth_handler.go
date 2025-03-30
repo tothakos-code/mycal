@@ -12,8 +12,8 @@ import (
 )
 
 type AuthHandler struct {
-	userRepo *repository.UserRepo
-	appJwt   *service.AppJwt
+	userRepo     *repository.UserRepo
+	appJwt       *service.AppJwt
 }
 
 func NewAuthHandler(userRepo *repository.UserRepo, appJwt *service.AppJwt) *AuthHandler {
@@ -25,8 +25,11 @@ func NewAuthHandler(userRepo *repository.UserRepo, appJwt *service.AppJwt) *Auth
 
 func (a *AuthHandler) HandleSignup() http.HandlerFunc {
 	type request struct {
-		Email    string `json:"email" validate:"required,email,min=4,max=254"`
-		Password string `json:"password" validate:"required,min=8,max=254"`
+		Email     string `json:"email" validate:"required,email,min=4,max=254"`
+		Password  string `json:"password" validate:"required,min=8,max=254"`
+    Username  string `json:"username" validate:"required,min=3,max=254"`
+  	FirstName string `json:"firstname" validate:"required,min=1,max=254"`
+  	SurName   string `json:"surname" validate:"required,min=1,max=254"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -63,12 +66,16 @@ func (a *AuthHandler) HandleSignup() http.HandlerFunc {
 		}
 		form.Password = string(hashedPassword)
 		form.Email = strings.ToLower(form.Email)
-		err = a.userRepo.CreateUser(ctx, form.Email, form.Password)
+
+
+
+		err = a.userRepo.CreateUser(ctx, form.Email, form.Password, form.Username, form.FirstName, form.SurName)
 		if err != nil {
 			log.Println("# Error creating user", err)
 			http.Error(w, "Server Error", http.StatusInternalServerError)
 			return
 		}
+
 		w.WriteHeader(http.StatusNoContent)
 	}
 }
