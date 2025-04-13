@@ -42,7 +42,7 @@ func (u *UserRepo) GetUserByEmail(ctx context.Context, email string) (*models.Us
 		&user.ID,
 		&user.Email,
 		&user.PasswordHash,
-    &user.Username,
+		&user.Username,
 		&user.FirstName,
 		&user.SurName,
 		&user.CreatedAt,
@@ -64,6 +64,9 @@ func (u *UserRepo) GetUserByID(ctx context.Context, id string) (*models.User, er
 		&user.ID,
 		&user.Email,
 		&user.PasswordHash,
+		&user.Username,
+		&user.FirstName,
+		&user.SurName,
 		&user.CreatedAt,
 	)
 	if err != nil {

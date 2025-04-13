@@ -2,8 +2,8 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import HomePage from "../views/HomePage.vue";
 import SignInPage from "../views/auth/SignInPage.vue";
 import SignUpPage from "../views/auth/SignUpPage.vue";
-import ProtectedPage from "../views/ProtectedPage.vue";
-import EventsPage from "../views/EventsPage.vue";
+import ProfilePage from "../views/ProfilePage.vue";
+import EventPage from "../views/EventPage.vue";
 import NotFoundPage from "../views/NotFoundPage.vue";
 import { useAuthStore } from "../stores/auth";
 import { watch } from "vue";
@@ -22,13 +22,14 @@ const routes: Array<RouteRecordRaw> = [
     component: SignUpPage,
   },
   {
-    path: "/events",
-    component: EventsPage,
+    path: "/event",
+    component: EventPage,
+    name: 'EventPage',
     meta: { requiresAuth: true },
   },
   {
-    path: "/protected",
-    component: ProtectedPage,
+    path: "/profile",
+    component: ProfilePage,
     meta: { requiresAuth: true },
   },
   {

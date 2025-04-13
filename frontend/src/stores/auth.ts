@@ -6,6 +6,10 @@ import Cookies from "js-cookie";
 interface User {
   id: number;
   email: string;
+  username: string;
+  firstname: string;
+  surname: string;
+  created_at: Date;
 }
 
 interface AuthState {
@@ -14,8 +18,6 @@ interface AuthState {
   exp: number | null;
   isLoading: boolean;
 }
-
-const STORAGE_KEY = "auth_data";
 
 export const useAuthStore = defineStore("auth", () => {
 
@@ -105,7 +107,7 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   function saveAuthData() {
-    Cookies.set("jwt", state.value.token);
+    Cookies.set("jwt", state.value.token, { expires: state.value.exp });
   }
 
   function clearAuthData() {

@@ -20,13 +20,15 @@ func RegisterRoutes(app *app.Application) http.Handler {
 	router.HandleFunc("POST /auth/signup", app.AuthHandler.HandleSignup())
 	router.HandleFunc("POST /auth/signin", app.AuthHandler.HandleSignin())
 	router.HandleFunc("POST /auth/signout", app.AuthHandler.HandleSignout)
-  router.HandleFunc("POST /auth/me", app.AppJwt.IsAuthenticatedMiddleware(app.AuthHandler.HandleCheckIfSignedIn()))
+	router.HandleFunc("POST /auth/me", app.AppJwt.IsAuthenticatedMiddleware(app.AuthHandler.HandleCheckIfSignedIn()))
 
 	// V1 Protected Routes
 	v1Protected := http.NewServeMux()
-  v1Protected.HandleFunc("GET /event/last-30", app.EventHandler.HandleListPublicEvents())
-  v1Protected.HandleFunc("PUT /event", app.EventHandler.HandleCreateEvent())
-  // v1Protected.HandleFunc("GET /invitation/pending")
+	v1Protected.HandleFunc("GET /event/last-30", app.EventHandler.HandleListPublicEvents())
+	v1Protected.HandleFunc("POST /event", app.EventHandler.HandleCreateEvent())
+	v1Protected.HandleFunc("PUT /event/{id}", app.EventHandler.HandleUpdateEvent())
+	v1Protected.HandleFunc("DELETE /event/{id}", app.EventHandler.HandleDeleteEvent())
+	// v1Protected.HandleFunc("GET /invitation/pending")
 
 	// Add middleware to protected routes
 	router.Handle("/v1/", http.StripPrefix("/v1", app.AppJwt.IsAuthenticatedMiddleware(v1Protected)))
