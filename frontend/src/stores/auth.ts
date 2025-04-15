@@ -2,15 +2,7 @@
 import { defineStore } from "pinia";
 import { ref, computed, watch } from "vue";
 import Cookies from "js-cookie";
-
-interface User {
-  id: number;
-  email: string;
-  username: string;
-  firstname: string;
-  surname: string;
-  created_at: Date;
-}
+import { useEventStore } from "./event";
 
 interface AuthState {
   user: User | null;
@@ -46,6 +38,7 @@ export const useAuthStore = defineStore("auth", () => {
       state.value.user = data?.user;
       state.value.exp = data?.exp;
       state.value.isLoading = false;
+      useEventStore().fetchUserEvents();
     } catch (error) {
       console.error("Session validation error:", error);
       clearAuthData();
@@ -82,6 +75,7 @@ export const useAuthStore = defineStore("auth", () => {
       state.value.token = data.token;
       state.value.exp = data.exp;
 
+      useEventStore().fetchUserEvents();
       saveAuthData();
     } catch (error) {
       console.error("Sign in error:", error);
@@ -116,6 +110,7 @@ export const useAuthStore = defineStore("auth", () => {
     state.value.exp = null;
     state.value.isLoading = false;
     Cookies.remove("jwt");
+    useEventStore().eventsPriv = [];
   }
 
   watch(state, () => {

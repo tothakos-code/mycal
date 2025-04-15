@@ -78,10 +78,18 @@ func (e *EventHandler) HandleListPublicEvents() http.HandlerFunc {
 			http.Error(w, "Server Error", http.StatusInternalServerError)
 			return
 		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(publicEvents)
+
+	}
+}
+func (e *EventHandler) HandleListPrivateEvents() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
 		userId, ok := service.GetUserIDFromContext(r)
 		if !ok {
-			log.Println("Error user_id not fount in context:", err)
-			http.Error(w, "Server Error", http.StatusInternalServerError)
+			log.Println("Error user_id not fount in context")
+			http.Error(w, "User not authenticated", http.StatusUnauthorized)
 			return
 		}
 		privateEvents, err := e.eventRepo.ListEventsByUserID(ctx, userId, false)
@@ -90,11 +98,8 @@ func (e *EventHandler) HandleListPublicEvents() http.HandlerFunc {
 			http.Error(w, "Server Error", http.StatusInternalServerError)
 			return
 		}
-		var allEvents []models.Event
-		allEvents = append(publicEvents, privateEvents...)
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(allEvents)
-
+		json.NewEncoder(w).Encode(privateEvents)
 	}
 }
 

@@ -10,8 +10,9 @@ import (
 )
 
 type Application struct {
-	AuthHandler *handler.AuthHandler
+	AuthHandler  *handler.AuthHandler
 	EventHandler *handler.EventHandler
+	UserHandler  *handler.UserHandler
 	// Add more handlers or services needed here
 	// Example
 	// Book Handler *handler.BookHandler
@@ -34,8 +35,9 @@ func NewApplication(cfg *config.Config) *Application {
 	service.InititalizeValidator()
 
 	return &Application{
-		AuthHandler: handler.NewAuthHandler(userRepo, appJwt),
-    EventHandler: handler.NewEventHandler(eventRepo, userRepo),
+		AuthHandler:  handler.NewAuthHandler(userRepo, appJwt),
+		EventHandler: handler.NewEventHandler(eventRepo, userRepo),
+		UserHandler:  handler.NewUserHandler(userRepo),
 		// BookHandler: handler.NewBookHandler(bookRepo, cloudinary),
 		AppJwt: appJwt,
 	}

@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 
 export interface Event {
   title: string,
+  user: User,
   description: string,
   location: string,
   start: Date,
@@ -13,7 +14,8 @@ export interface Event {
 export const useEventStore = defineStore('event', {
   state: () => ({
     event: null,
-    events: [],
+    eventsPub: [],
+    eventsPriv: [],
     isLoading: true
   }),
   actions: {
@@ -29,16 +31,25 @@ export const useEventStore = defineStore('event', {
           credentials: "include",
         });
         if (!eventsRes.ok) throw new Error("Failed to fetch events");
-        this.events = await eventsRes.json();
+        this.eventsPub = await eventsRes.json();
         this.isLoading = true;
-        // // Fetch pending invitations if authenticated
-        // if (authStore.isAuthenticated) {
-        //   const invitationsRes = await fetch("http://localhost:8001/invitations/pending", {
-        //     credentials: "include",
-        //   });
-        //   if (!invitationsRes.ok) throw new Error("Failed to fetch invitations");
-        //   invitations.value = await invitationsRes.json();
-        // }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async fetchUserEvents() {
+      try {
+        this.isLoading = true;
+
+        // Fetch last 30 events
+        const eventsRes = await fetch("http://localhost:8001/v1/event/last-30-private", {
+          credentials: "include",
+        });
+        if (!eventsRes.ok) throw new Error("Failed to fetch events");
+        this.eventsPriv = await eventsRes.json();
+        this.isLoading = true;
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {

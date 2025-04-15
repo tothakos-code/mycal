@@ -10,25 +10,25 @@
       <v-col cols="12" v-if="!isEditing">
         <v-list>
           <v-list-item>
-            <v-list-item-content>
               <v-list-item-title><strong>Title:</strong> {{ eventStore.event.title }}</v-list-item-title>
               <v-list-item-subtitle>{{ eventStore.event.description }}</v-list-item-subtitle>
-            </v-list-item-content>
           </v-list-item>
           <v-list-item>
-            <v-list-item-content>
               <v-list-item-title><strong>Location:</strong> {{ eventStore.event.location }}</v-list-item-title>
               <v-list-item-subtitle><strong>Start:</strong> {{ new Date(eventStore.event.start).toLocaleString('HU') }}</v-list-item-subtitle>
               <v-list-item-subtitle><strong>Finish:</strong> {{ new Date(eventStore.event.finish).toLocaleString('HU') }}</v-list-item-subtitle>
-            </v-list-item-content>
           </v-list-item>
           <v-list-item>
-            <v-list-item-content>
               <v-list-item-title><strong>Notify Before:</strong> {{ eventStore.event.notify_before }} minutes</v-list-item-title>
               <v-list-item-title><strong>Public:</strong> {{ eventStore.event.is_public ? 'Yes' : 'No' }}</v-list-item-title>
               <v-list-item-title><strong>Created At:</strong> {{ new Date(eventStore.event.created_at).toLocaleString('HU') }}</v-list-item-title>
-            </v-list-item-content>
+              <v-list-item-title>
+              </v-list-item-title>
           </v-list-item>
+          <v-list-item>
+            <strong>Organizer:</strong>      <v-btn variant="text" density="compact" :to="'/user/' + eventStore.event.user.id" >@{{ eventStore.event.user.username }}</v-btn>
+          </v-list-item>
+
         </v-list>
       </v-col>
 
@@ -48,10 +48,10 @@
       <!-- Buttons -->
       <v-col cols="12" class="d-flex justify-start">
         <v-btn color="primary" @click="goBack">Back</v-btn>
-        <v-btn v-if="!isEditing" color="blue" @click="editEvent">Edit</v-btn>
+        <v-btn v-if="authStore.user && editedEvent.user.id === authStore.user.id && !isEditing" color="blue" @click="editEvent">Edit</v-btn>
         <v-btn v-if="isEditing" color="red" @click="deleteEvent">Delete</v-btn>
         <v-btn v-if="isEditing" color="green" @click="saveEvent">Save</v-btn>
-        <v-btn v-if="!isEditing" color="teal" @click="invitePeople">Invite People</v-btn>
+        <v-btn v-if="authStore.user && !isEditing" color="teal" @click="invitePeople">Invite People</v-btn>
       </v-col>
     </v-row>
   </div>
@@ -60,6 +60,8 @@
 <script setup lang="ts">
 import {ref} from 'vue'
 import {useEventStore, Event} from '../stores/event'
+import { useAuthStore } from '../stores/auth'
+const { state: authStore } = useAuthStore();
 
 // Store and data initialization
 const eventStore = useEventStore()

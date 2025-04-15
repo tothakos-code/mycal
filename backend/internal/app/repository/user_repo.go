@@ -35,6 +35,18 @@ func (u *UserRepo) CreateUser(
 	return nil
 }
 
+func (u *UserRepo) UpdateUser(ctx context.Context, user models.User) error {
+	query := `UPDATE users
+			  SET firstname = $1, surname = $2, password_hash = $3
+			  WHERE id = $4`
+
+	_, err := u.db.ExecContext(ctx, query,
+		user.FirstName, user.SurName,
+		user.PasswordHash, user.ID)
+
+	return err
+}
+
 func (u *UserRepo) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	var user models.User
 	query := `SELECT * FROM users WHERE email = $1`

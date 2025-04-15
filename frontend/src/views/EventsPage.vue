@@ -55,16 +55,18 @@
 
               <span v-if="event.is_public" class="text-green-600">Public</span>
               <span v-else class="text-green-600">Private</span>
+              <br>
+              <span class="text-green-600">{{ event.user.firstname }} {{ event.user.surname }}</span>
 
-              <template v-slot:append="{ isSelected }">
+              <template v-slot:append="{  }">
                 <v-list-item-action class="flex-column align-end">
                   <small class="mb-4 text-high-emphasis opacity-60">{{ event.action }}</small>
 
                   <v-spacer></v-spacer>
 
-                  <v-icon v-if="isSelected" color="yellow-darken-3">mdi-star</v-icon>
-
-                  <v-icon v-else class="opacity-30">mdi-star-outline</v-icon>
+                  <v-icon color="green-darken-3">mdi-check-circle-outline</v-icon>
+                  <v-icon color="yellow-darken-3">mdi-help-circle-outline</v-icon>
+                  <v-icon color="red-darken-3">mdi-close-circle-outline</v-icon>
                 </v-list-item-action>
               </template>
             </v-list-item>
@@ -111,7 +113,7 @@ function openEvent(event: Event) {
 
 // Computed: Merge events & pending invitations and sort by date
 const sortedEvents = computed(() => {
-  return [...eventStore.events, ...invitations.value].sort(
+  return [...eventStore.eventsPub, ...eventStore.eventsPriv || []].sort(
     (a, b) => new Date(a.start) - new Date(b.start)
   );
 });
@@ -137,6 +139,7 @@ async function createEvent() {
 
     showCreateForm.value = false;
     await eventStore.fetchEvents();
+    await eventStore.fetchUserEvents();
   } catch (error) {
     console.error("Error creating event:", error);
   }
@@ -144,6 +147,7 @@ async function createEvent() {
 
 // Load data on mount
 eventStore.fetchEvents();
+if (authStore.user) eventStore.fetchUserEvents();
 </script>
 
 <style scoped>

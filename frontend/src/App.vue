@@ -5,47 +5,38 @@
   density="compact"
   flat
 >
-  <v-avatar
-    class="hidden-md-and-up"
-    color="grey-darken-1"
-    size="32"
-  ></v-avatar>
-
   <v-spacer></v-spacer>
 
   <v-tabs
     align-tabs="center"
     color="grey-darken-2"
   >
-    <v-tab
-      v-if="state.user"
-      text="Sign Out"
-      @click="signOut"
-    ></v-tab>
-    <v-tab
-      v-else
-      tag="router-link"
-      to="/auth/sign-in"
-      text="Sign In"
-    ></v-tab>
+
+
     <v-tab
       tag="router-link"
       to="/"
       text="Home"
     ></v-tab>
     <v-tab
+      v-if="state.user"
       tag="router-link"
       to="/profile"
-      text="Profile Page 🛡️"
+      text="Profile"
+    ></v-tab>
+    <v-tab
+        v-if="state.user"
+        text="Sign Out"
+        @click="signOut"
+    ></v-tab>
+    <v-tab
+        v-else
+        tag="router-link"
+        to="/auth/sign-in"
+        text="Sign In"
     ></v-tab>
   </v-tabs>
   <v-spacer></v-spacer>
-
-  <v-avatar
-    class="hidden-sm-and-down"
-    color="grey-darken-1"
-    size="32"
-  ></v-avatar>
 </v-app-bar>
 <v-main class="bg-grey-lighten-3">
   <router-view></router-view>

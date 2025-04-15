@@ -63,9 +63,15 @@ func (e *EventRepo) GetEventByID(ctx context.Context, eventID uuid.UUID) (*model
 	return &event, nil
 }
 
-func (e *EventRepo) ListPublicEvents(ctx context.Context) ([]models.Event, error) {
-	query := `SELECT * FROM event
-			  WHERE is_public = TRUE`
+func (e *EventRepo) ListPublicEvents(ctx context.Context) ([]models.EventWithUser, error) {
+	query := `SELECT e.id, e.title, e.description,
+		e.location, e.start, e.finish,
+		e.notify_before, e.is_public, e.created_at,
+		u.id, u.email, u.username,
+		u.firstname, u.surname, u.created_at
+		FROM event e
+		JOIN "users" u ON u.id = e.user_id
+		WHERE is_public = TRUE`
 
 	rows, err := e.db.QueryContext(ctx, query)
 	if err != nil {
@@ -73,26 +79,36 @@ func (e *EventRepo) ListPublicEvents(ctx context.Context) ([]models.Event, error
 	}
 	defer rows.Close()
 
-	var events []models.Event
+	var events []models.EventWithUser
 	for rows.Next() {
-		var event models.Event
-		if err := rows.Scan(&event.ID, &event.UserID,
+		var event models.EventWithUser
+		if err := rows.Scan(&event.ID,
 			&event.Title, &event.Description, &event.Location,
 			&event.Start, &event.Finish, &event.NotifyBefore,
-			&event.Public, &event.CreatedAt); err != nil {
+			&event.Public, &event.CreatedAt,
+			&event.User.ID, &event.User.Email, &event.User.Username,
+			&event.User.FirstName, &event.User.SurName, &event.User.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		events = append(events, event)
 	}
 
 	if events == nil {
-		events = []models.Event{}
+		events = []models.EventWithUser{}
 	}
 	return events, nil
 }
 
-func (e *EventRepo) ListEventsByUserID(ctx context.Context, userID uuid.UUID, is_public bool) ([]models.Event, error) {
-	query := `SELECT * FROM event WHERE user_id = $1 AND is_public = $2`
+func (e *EventRepo) ListEventsByUserID(ctx context.Context, userID uuid.UUID, is_public bool) ([]models.EventWithUser, error) {
+	query := `SELECT e.id, e.title, e.description,
+		e.location, e.start, e.finish,
+		e.notify_before, e.is_public, e.created_at,
+		u.id, u.email, u.username,
+		u.firstname, u.surname, u.created_at
+		FROM event e
+		JOIN "users" u ON u.id = e.user_id
+		WHERE user_id = $1 AND is_public = $2`
 
 	rows, err := e.db.QueryContext(ctx, query, userID, is_public)
 	if err != nil {
@@ -100,13 +116,16 @@ func (e *EventRepo) ListEventsByUserID(ctx context.Context, userID uuid.UUID, is
 	}
 	defer rows.Close()
 
-	var events []models.Event
+	var events []models.EventWithUser
 	for rows.Next() {
-		var event models.Event
-		if err := rows.Scan(&event.ID, &event.UserID,
+		var event models.EventWithUser
+		if err := rows.Scan(&event.ID,
 			&event.Title, &event.Description, &event.Location,
 			&event.Start, &event.Finish, &event.NotifyBefore,
-			&event.Public, &event.CreatedAt); err != nil {
+			&event.Public, &event.CreatedAt,
+			&event.User.ID, &event.User.Email, &event.User.Username,
+			&event.User.FirstName, &event.User.SurName, &event.User.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		events = append(events, event)

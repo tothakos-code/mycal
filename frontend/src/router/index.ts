@@ -3,6 +3,7 @@ import HomePage from "../views/HomePage.vue";
 import SignInPage from "../views/auth/SignInPage.vue";
 import SignUpPage from "../views/auth/SignUpPage.vue";
 import ProfilePage from "../views/ProfilePage.vue";
+import UserPage from "../views/UserPage.vue";
 import EventPage from "../views/EventPage.vue";
 import NotFoundPage from "../views/NotFoundPage.vue";
 import { useAuthStore } from "../stores/auth";
@@ -31,6 +32,9 @@ const routes: Array<RouteRecordRaw> = [
     path: "/profile",
     component: ProfilePage,
     meta: { requiresAuth: true },
+  },  {
+    path: "/user/:id",
+    component: UserPage,
   },
   {
     path: "/:pathMatch(.*)*",
